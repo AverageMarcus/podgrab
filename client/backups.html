@@ -23,36 +23,42 @@
   img{
     display: block
   }
- 
+
 }
     </style>
 </head>
 <body>
     <div class="container">
- 
+
 {{template "navbar" .}}
 <br>
+<div class="row">
+    <div class="columns two">
+        <a href="/backups/new" class="button">Create Backup</a>
+    </div>
+</div>
+<hr />
 <div class="row" id="app">
     <div class="columns twelve">
         <table class="u-full-width">
             <thead>
                 <th>Date</th>
-        <th>Path</th>
-    </thead>
-    <tbody>
-   {{ range .backups}}
-       <tr>
-           <td>{{ formatDate .date }}</td>
-           <td><a href="{{ .path }}" download="">{{.name}}</a></td>
-       </tr>
-   {{end}}
-</tbody>
-</table>
-</div>
+                <th>Path</th>
+            </thead>
+            <tbody>
+                {{ range .backups}}
+                    <tr>
+                        <td>{{ formatDate .date }}</td>
+                        <td><a href="{{ .path }}" download="">{{.name}}</a></td>
+                    </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {{template "scripts"}}
-<script> 
+<script>
     </script>
 </body>
 </html>

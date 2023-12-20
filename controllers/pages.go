@@ -21,17 +21,17 @@ type SearchGPodderData struct {
 	SearchSource string `binding:"required" form:"searchSource" json:"searchSource" query:"searchSource"`
 }
 type SettingModel struct {
-	DownloadOnAdd                 bool   `form:"downloadOnAdd" json:"downloadOnAdd" query:"downloadOnAdd"`
-	InitialDownloadCount          int    `form:"initialDownloadCount" json:"initialDownloadCount" query:"initialDownloadCount"`
-	AutoDownload                  bool   `form:"autoDownload" json:"autoDownload" query:"autoDownload"`
-	FileNameFormat                string `form:"fileNameFormat" json:"fileNameFormat" query:"fileNameFormat"`
-	DarkMode                      bool   `form:"darkMode" json:"darkMode" query:"darkMode"`
-	DownloadEpisodeImages         bool   `form:"downloadEpisodeImages" json:"downloadEpisodeImages" query:"downloadEpisodeImages"`
-	GenerateNFOFile               bool   `form:"generateNFOFile" json:"generateNFOFile" query:"generateNFOFile"`
-	DontDownloadDeletedFromDisk   bool   `form:"dontDownloadDeletedFromDisk" json:"dontDownloadDeletedFromDisk" query:"dontDownloadDeletedFromDisk"`
-	BaseUrl                       string `form:"baseUrl" json:"baseUrl" query:"baseUrl"`
-	MaxDownloadConcurrency        int    `form:"maxDownloadConcurrency" json:"maxDownloadConcurrency" query:"maxDownloadConcurrency"`
-	UserAgent                     string `form:"userAgent" json:"userAgent" query:"userAgent"`
+	DownloadOnAdd               bool   `form:"downloadOnAdd" json:"downloadOnAdd" query:"downloadOnAdd"`
+	InitialDownloadCount        int    `form:"initialDownloadCount" json:"initialDownloadCount" query:"initialDownloadCount"`
+	AutoDownload                bool   `form:"autoDownload" json:"autoDownload" query:"autoDownload"`
+	FileNameFormat              string `form:"fileNameFormat" json:"fileNameFormat" query:"fileNameFormat"`
+	DarkMode                    bool   `form:"darkMode" json:"darkMode" query:"darkMode"`
+	DownloadEpisodeImages       bool   `form:"downloadEpisodeImages" json:"downloadEpisodeImages" query:"downloadEpisodeImages"`
+	GenerateNFOFile             bool   `form:"generateNFOFile" json:"generateNFOFile" query:"generateNFOFile"`
+	DontDownloadDeletedFromDisk bool   `form:"dontDownloadDeletedFromDisk" json:"dontDownloadDeletedFromDisk" query:"dontDownloadDeletedFromDisk"`
+	BaseUrl                     string `form:"baseUrl" json:"baseUrl" query:"baseUrl"`
+	MaxDownloadConcurrency      int    `form:"maxDownloadConcurrency" json:"maxDownloadConcurrency" query:"maxDownloadConcurrency"`
+	UserAgent                   string `form:"userAgent" json:"userAgent" query:"userAgent"`
 }
 
 var searchOptions = map[string]string{
@@ -196,6 +196,16 @@ func SettingsPage(c *gin.Context) {
 	})
 
 }
+
+func NewBackup(c *gin.Context) {
+	_, err := service.CreateBackup()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.Redirect(http.StatusTemporaryRedirect, "/backups")
+}
+
 func BackupsPage(c *gin.Context) {
 
 	files, err := service.GetAllBackupFiles()

@@ -192,6 +192,7 @@ func main() {
 	router.GET("/settings", controllers.SettingsPage)
 	router.POST("/settings", controllers.UpdateSetting)
 	router.GET("/backups", controllers.BackupsPage)
+	router.GET("/backups/new", controllers.NewBackup)
 	router.POST("/opml", controllers.UploadOpml)
 	router.GET("/opml", controllers.GetOmpl)
 	router.GET("/player", controllers.PlayerPage)
