@@ -194,6 +194,8 @@ func Name(s string) string {
 	// Remove illegal characters for names, replacing some common separators with -
 	fileName = cleanString(fileName, illegalName)
 
+	fileName = strings.ToValidUTF8(fileName, "")
+
 	// NB this may be of length 0, caller must check
 	return fileName
 }
