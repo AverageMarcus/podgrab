@@ -187,7 +187,7 @@ var illegalName = regexp.MustCompile(`[^[:alnum:]-.]`)
 func Name(s string) string {
 	// Start with lowercase string
 	fileName := s
-	fileName = baseNameSeparators.ReplaceAllString(fileName, "-")
+	fileName = baseNameSeparators.ReplaceAllString(fileName, "")
 
 	fileName = path.Clean(path.Base(fileName))
 
@@ -206,7 +206,7 @@ var baseNameSeparators = regexp.MustCompile(`[./]`)
 func BaseName(s string) string {
 
 	// Replace certain joining characters with a dash
-	baseName := baseNameSeparators.ReplaceAllString(s, "-")
+	baseName := baseNameSeparators.ReplaceAllString(s, "")
 
 	// Remove illegal characters for names, replacing some common separators with -
 	baseName = cleanString(baseName, illegalName)
@@ -368,7 +368,7 @@ func cleanString(s string, r *regexp.Regexp) string {
 	s = Accents(s)
 
 	// Replace certain joining characters with a dash
-	s = separators.ReplaceAllString(s, "-")
+	s = separators.ReplaceAllString(s, "")
 
 	// Remove all other unrecognised characters - NB we do allow any printable characters
 	//s = r.ReplaceAllString(s, "")
