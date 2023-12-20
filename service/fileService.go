@@ -31,6 +31,7 @@ func Download(link string, episodeTitle string, podcastName string, episodePathN
 	req, err := getRequest(link)
 	if err != nil {
 		Logger.Errorw("Error creating request: "+link, err)
+		return "", err
 	}
 
 	resp, err := client.Do(req)

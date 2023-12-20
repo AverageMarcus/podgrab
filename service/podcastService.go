@@ -15,8 +15,8 @@ import (
 
 	"github.com/TheHippo/podcastindex"
 	"github.com/akhilrex/podgrab/db"
-	"github.com/akhilrex/podgrab/model"
 	"github.com/akhilrex/podgrab/internal/sanitize"
+	"github.com/akhilrex/podgrab/model"
 	"github.com/antchfx/xmlquery"
 	strip "github.com/grokify/html-strip-tags-go"
 	"go.uber.org/zap"
@@ -37,7 +37,7 @@ func ParseOpml(content string) (model.OpmlModel, error) {
 	return response, err
 }
 
-//FetchURL is
+// FetchURL is
 func FetchURL(url string) (model.PodcastData, []byte, error) {
 	body, err := makeQuery(url)
 	if err != nil {
@@ -540,7 +540,7 @@ func FormatFileName(item *db.PodcastItem, formatString string) string {
 	var matchedTokens = format_re.FindAllStringIndex(formatString, -1)
 	var previousTokenEndingIndex = 0
 	var formattedFileName = ""
-	for _,t := range matchedTokens {
+	for _, t := range matchedTokens {
 		if previousTokenEndingIndex != t[0] {
 			formattedFileName += formatString[previousTokenEndingIndex:t[0]]
 		}
@@ -548,7 +548,7 @@ func FormatFileName(item *db.PodcastItem, formatString string) string {
 		tokenArgs := strings.Split(token[1:len(token)-1], ":")
 		tokenFunction := format_map["%"+tokenArgs[0]+"%"]
 		if nil != tokenFunction {
-			token = tokenFunction.(func(*db.PodcastItem, ...string)string)(item, tokenArgs[1:]...)
+			token = tokenFunction.(func(*db.PodcastItem, ...string) string)(item, tokenArgs[1:]...)
 			token = sanitize.Name(token)
 		}
 		formattedFileName += token
@@ -568,6 +568,7 @@ func DownloadMissingEpisodes() error {
 		return nil
 	}
 	db.Lock(JOB_NAME, 120)
+	defer db.Unlock(JOB_NAME)
 	setting := db.GetOrCreateSetting()
 
 	data, err := db.GetAllPodcastItemsToBeDownloaded()
@@ -591,7 +592,6 @@ func DownloadMissingEpisodes() error {
 		}
 	}
 	wg.Wait()
-	db.Unlock(JOB_NAME)
 	return nil
 }
 func CheckMissingFiles() error {
@@ -831,18 +831,18 @@ func GetSearchFromPodcastIndex(pod *podcastindex.Podcast) *model.CommonSearchRes
 }
 
 func UpdateSettings(
-			downloadOnAdd bool,
-			initialDownloadCount int,
-			autoDownload bool,
-			fileNameFormat string,
-			darkMode bool,
-			downloadEpisodeImages bool,
-			generateNFOFile bool,
-			dontDownloadDeletedFromDisk bool,
-			baseUrl string,
-			maxDownloadConcurrency int,
-			userAgent string,
-		) error {
+	downloadOnAdd bool,
+	initialDownloadCount int,
+	autoDownload bool,
+	fileNameFormat string,
+	darkMode bool,
+	downloadEpisodeImages bool,
+	generateNFOFile bool,
+	dontDownloadDeletedFromDisk bool,
+	baseUrl string,
+	maxDownloadConcurrency int,
+	userAgent string,
+) error {
 	setting := db.GetOrCreateSetting()
 
 	setting.AutoDownload = autoDownload
