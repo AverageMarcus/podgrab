@@ -568,13 +568,13 @@ func DownloadMissingEpisodes() error {
 		return nil
 	}
 	db.Lock(JOB_NAME, 120)
-	defer db.Unlock(JOB_NAME)
 	setting := db.GetOrCreateSetting()
 
 	data, err := db.GetAllPodcastItemsToBeDownloaded()
 
 	fmt.Println("Processing episodes: ", strconv.Itoa(len(*data)))
 	if err != nil {
+		db.Unlock(JOB_NAME)
 		return err
 	}
 	var wg sync.WaitGroup
@@ -592,6 +592,7 @@ func DownloadMissingEpisodes() error {
 		}
 	}
 	wg.Wait()
+	db.Unlock(JOB_NAME)
 	return nil
 }
 func CheckMissingFiles() error {
