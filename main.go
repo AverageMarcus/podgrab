@@ -203,6 +203,9 @@ func main() {
 	})
 	go controllers.HandleWebsocketMessages()
 
+	// Ensure DB is unlocked on startup
+	db.Unlock("DownloadMissingEpisodes")
+
 	go assetEnv()
 	go intiCron()
 
