@@ -225,6 +225,11 @@ func intiCron() {
 		checkFrequency = 30
 		log.Print(err)
 	}
+	backupFrequency, err := strconv.Atoi(os.Getenv("BACKUP_FREQUENCY"))
+	if err != nil {
+		backupFrequency = 1
+		log.Print(err)
+	}
 	service.UnlockMissedJobs()
 	//gocron.Every(uint64(checkFrequency)).Minutes().Do(service.DownloadMissingEpisodes)
 	gocron.Every(uint64(checkFrequency)).Minutes().Do(service.RefreshEpisodes)
@@ -232,7 +237,7 @@ func intiCron() {
 	gocron.Every(uint64(checkFrequency) * 2).Minutes().Do(service.UnlockMissedJobs)
 	gocron.Every(uint64(checkFrequency) * 3).Minutes().Do(service.UpdateAllFileSizes)
 	gocron.Every(uint64(checkFrequency)).Minutes().Do(service.DownloadMissingImages)
-	gocron.Every(2).Days().Do(service.CreateBackup)
+	gocron.Every(uint64(backupFrequency)).Days().Do(service.CreateBackup)
 	<-gocron.Start()
 }
 

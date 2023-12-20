@@ -36,11 +36,17 @@
 
 ## Table of Contents
 
-- [About the Project](#about-the-project)
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
   - [Motivation](#motivation)
   - [Built With](#built-with)
   - [Features](#features)
 - [Installation](#installation)
+  - [Using Docker](#using-docker)
+  - [Using Docker-Compose](#using-docker-compose)
+  - [Build from Source / Ubuntu Installation](#build-from-source--ubuntu-installation)
+  - [Environment Variables](#environment-variables)
+  - [Setup](#setup)
 - [License](#license)
 - [Roadmap](#roadmap)
 - [Contact](#contact)
@@ -139,8 +145,9 @@ Although personally I feel that using the docker container is the best way of us
 | Name            | Description                                                             | Default |
 | --------------- | ----------------------------------------------------------------------- | ------- |
 | CHECK_FREQUENCY | How frequently to check for new episodes and missing files (in minutes) | 30      |
+| BACKUP_FREQUENCY| How frequently to create a new backup (in days)                         | 1      |
 | PASSWORD        | Set to some non empty value to enable Basic Authentication, username `podgrab`|(empty)|
-| PORT            | Change the internal port of the application. If you change this you might have to change your docker configuration as well | (empty) |  
+| PORT            | Change the internal port of the application. If you change this you might have to change your docker configuration as well | (empty) |
 
 ### Setup
 
@@ -162,7 +169,7 @@ Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 - [x] OPML import
 - [x] OPML export
 - [x] In built podcast player
-- [ ] Set ID3 tags if not set 
+- [ ] Set ID3 tags if not set
 - [ ] Filtering and Sorting options
 - [ ] Native installer for Windows/Linux/MacOS
 
