@@ -26,6 +26,11 @@ func Download(link string, episodeTitle string, podcastName string, episodePathN
 	if link == "" {
 		return "", errors.New("Download path empty")
 	}
+
+	if podcastName == "" {
+		return "", errors.New("Podcast name is empty")
+	}
+
 	client := httpClient()
 
 	req, err := getRequest(link)
@@ -109,6 +114,11 @@ func DownloadPodcastCoverImage(link string, podcastName string) (string, error) 
 	if link == "" {
 		return "", errors.New("Download path empty")
 	}
+
+	if podcastName == "" {
+		return "", errors.New("Podcast name is empty")
+	}
+
 	client := httpClient()
 	req, err := getRequest(link)
 	if err != nil {
@@ -152,6 +162,11 @@ func DownloadImage(link string, episodeId string, podcastName string) (string, e
 	if link == "" {
 		return "", errors.New("Download path empty")
 	}
+
+	if podcastName == "" {
+		return "", errors.New("Podcast name is empty")
+	}
+
 	client := httpClient()
 	req, err := getRequest(link)
 	if err != nil {
@@ -192,6 +207,7 @@ func DownloadImage(link string, episodeId string, podcastName string) (string, e
 	return finalPath, nil
 
 }
+
 func changeOwnership(path string) {
 	uid, err1 := strconv.Atoi(os.Getenv("PUID"))
 	gid, err2 := strconv.Atoi(os.Getenv("PGID"))
@@ -202,6 +218,7 @@ func changeOwnership(path string) {
 	}
 
 }
+
 func DeleteFile(filePath string) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return err
@@ -211,6 +228,7 @@ func DeleteFile(filePath string) error {
 	}
 	return nil
 }
+
 func FileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return err == nil
@@ -275,7 +293,6 @@ func GetFileSizeFromUrl(url string) (int64, error) {
 }
 
 func CreateBackup() (string, error) {
-
 	backupFileName := "podgrab_backup_" + time.Now().Format("2006.01.02_150405") + ".tar.gz"
 	folder := createConfigFolderIfNotExists("backups")
 	configPath := os.Getenv("CONFIG")
@@ -335,6 +352,7 @@ func addFileToTarWriter(filePath string, tarWriter *tar.Writer) error {
 
 	return nil
 }
+
 func httpClient() *http.Client {
 	client := http.Client{
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
@@ -379,6 +397,7 @@ func createDataFolderIfNotExists(folder string) string {
 	dataPath := os.Getenv("DATA")
 	return createFolder(folder, dataPath)
 }
+
 func createConfigFolderIfNotExists(folder string) string {
 	dataPath := os.Getenv("CONFIG")
 	return createFolder(folder, dataPath)
