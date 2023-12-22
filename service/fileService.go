@@ -31,19 +31,22 @@ func Download(link string, episodeTitle string, podcastName string, episodePathN
 		return "", errors.New("Podcast name is empty")
 	}
 
+	fmt.Printf("Downloading episode: podcastName=%s, episodePathName=%s\n", podcastName, episodePathName)
+
 	client := httpClient()
 
 	req, err := getRequest(link)
 	if err != nil {
-		Logger.Errorw("Error creating request: "+link, err)
+		fmt.Println("Error creating request: "+link, err)
 		return "", err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		Logger.Errorw("Error getting response: "+link, err)
+		fmt.Println("Error getting response: "+link, err)
 		return "", err
 	}
+	defer resp.Body.Close()
 
 	fileExtension := path.Ext(getFileName(link, episodeTitle, ".mp3"))
 	finalPath := path.Join(
@@ -53,27 +56,22 @@ func Download(link string, episodeTitle string, podcastName string, episodePathN
 	dir, _ := path.Split(finalPath)
 	createPreSanitizedPath(dir)
 
-	if _, err := os.Stat(finalPath); !os.IsNotExist(err) {
-		changeOwnership(finalPath)
-		return finalPath, nil
-	}
-
-	file, err := os.Create(finalPath)
+	file, err := os.OpenFile(finalPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		Logger.Errorw("Error creating file"+link, err)
+		fmt.Println("Error opening file: "+link, err)
 		return "", err
 	}
-	defer resp.Body.Close()
-	_, erra := io.Copy(file, resp.Body)
-	//fmt.Println(size)
 	defer file.Close()
-	if erra != nil {
-		Logger.Errorw("Error saving file"+link, err)
-		return "", erra
-	}
-	changeOwnership(finalPath)
-	return finalPath, nil
 
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		fmt.Println("Error saving file: "+link, err)
+		return "", err
+	}
+
+	changeOwnership(finalPath)
+
+	return finalPath, nil
 }
 
 func GetPodcastLocalImagePath(link string, podcastName string) string {
@@ -211,12 +209,10 @@ func DownloadImage(link string, episodeId string, podcastName string) (string, e
 func changeOwnership(path string) {
 	uid, err1 := strconv.Atoi(os.Getenv("PUID"))
 	gid, err2 := strconv.Atoi(os.Getenv("PGID"))
-	fmt.Println(path)
 	if err1 == nil && err2 == nil {
-		fmt.Println(path + " : Attempting change")
+		fmt.Printf("Changing path ownership of %s", path)
 		os.Chown(path, uid, gid)
 	}
-
 }
 
 func DeleteFile(filePath string) error {
