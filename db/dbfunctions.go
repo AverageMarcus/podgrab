@@ -288,7 +288,6 @@ func GetPodcastItemsByPodcastIdAndGUIDs(podcastId string, guids []string) (*[]Po
 	return &podcastItems, result.Error
 }
 func GetPodcastItemByPodcastIdAndGUID(podcastId string, guid string, podcastItem *PodcastItem) error {
-
 	result := DB.Preload(clause.Associations).Where(&PodcastItem{PodcastID: podcastId, GUID: guid}).First(&podcastItem)
 	return result.Error
 }
@@ -296,6 +295,12 @@ func GetPodcastByTitleAndAuthor(title string, author string, podcast *Podcast) e
 
 	result := DB.Preload(clause.Associations).Where(&Podcast{Title: title, Author: author}).First(&podcast)
 	return result.Error
+}
+
+func DoesPodcastItemExist(podcastId string, guid string) (bool, error) {
+	var podcastItem PodcastItem
+	result := DB.Where(&PodcastItem{PodcastID: podcastId, GUID: guid}).First(&podcastItem)
+	return result.RowsAffected > 0, result.Error
 }
 
 func CreatePodcast(podcast *Podcast) error {

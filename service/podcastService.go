@@ -245,95 +245,77 @@ func AddPodcast(url string) (db.Podcast, error) {
 }
 
 func AddPodcastItems(podcast *db.Podcast, newPodcast bool) error {
-	//fmt.Println("Creating: " + podcast.ID)
 	data, _, err := FetchURL(podcast.URL)
 	if err != nil {
-		//log.Fatal(err)
 		return err
 	}
 	setting := db.GetOrCreateSetting()
 	limit := setting.InitialDownloadCount
-	// if len(data.Channel.Item) < limit {
-	// 	limit = len(data.Channel.Item)
-	// }
-	var allGuids []string
-	for i := 0; i < len(data.Channel.Item); i++ {
-		obj := data.Channel.Item[i]
-		allGuids = append(allGuids, obj.Guid.Text)
-	}
 
-	existingItems, err := db.GetPodcastItemsByPodcastIdAndGUIDs(podcast.ID, allGuids)
-	keyMap := make(map[string]int)
-
-	for _, item := range *existingItems {
-		keyMap[item.GUID] = 1
-	}
 	var latestDate = time.Time{}
-	var itemsAdded = make(map[string]string)
+
 	for i := 0; i < len(data.Channel.Item); i++ {
 		obj := data.Channel.Item[i]
 		var podcastItem db.PodcastItem
-		_, keyExists := keyMap[obj.Guid.Text]
-		if !keyExists {
-			duration, _ := strconv.Atoi(obj.Duration)
-			toParse := strings.TrimSpace(obj.PubDate)
 
-			pubDate, _ := time.Parse(time.RFC1123Z, toParse)
-			if (pubDate == time.Time{}) {
-				pubDate, _ = time.Parse(time.RFC1123, toParse)
-			}
-			if (pubDate == time.Time{}) {
-				//	RFC1123     = "Mon, 02 Jan 2006 15:04:05 MST"
-				modifiedRFC1123 := "Mon, 2 Jan 2006 15:04:05 MST"
-				pubDate, _ = time.Parse(modifiedRFC1123, toParse)
-			}
-			if (pubDate == time.Time{}) {
-				//	RFC1123Z    = "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
-				modifiedRFC1123Z := "Mon, 2 Jan 2006 15:04:05 -0700"
-				pubDate, _ = time.Parse(modifiedRFC1123Z, toParse)
-			}
-			if (pubDate == time.Time{}) {
-				//	RFC1123Z    = "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
-				modifiedRFC1123Z := "Mon, 02 Jan 2006 15:04:05 -0700"
-				pubDate, _ = time.Parse(modifiedRFC1123Z, toParse)
-			}
+		duration, _ := strconv.Atoi(obj.Duration)
+		toParse := strings.TrimSpace(obj.PubDate)
 
-			if (pubDate == time.Time{}) {
-				fmt.Printf("Cant format date : %s", obj.PubDate)
-			}
+		pubDate, _ := time.Parse(time.RFC1123Z, toParse)
+		if (pubDate == time.Time{}) {
+			pubDate, _ = time.Parse(time.RFC1123, toParse)
+		}
+		if (pubDate == time.Time{}) {
+			//	RFC1123     = "Mon, 02 Jan 2006 15:04:05 MST"
+			modifiedRFC1123 := "Mon, 2 Jan 2006 15:04:05 MST"
+			pubDate, _ = time.Parse(modifiedRFC1123, toParse)
+		}
+		if (pubDate == time.Time{}) {
+			//	RFC1123Z    = "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
+			modifiedRFC1123Z := "Mon, 2 Jan 2006 15:04:05 -0700"
+			pubDate, _ = time.Parse(modifiedRFC1123Z, toParse)
+		}
+		if (pubDate == time.Time{}) {
+			//	RFC1123Z    = "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
+			modifiedRFC1123Z := "Mon, 02 Jan 2006 15:04:05 -0700"
+			pubDate, _ = time.Parse(modifiedRFC1123Z, toParse)
+		}
 
-			if latestDate.Before(pubDate) {
-				latestDate = pubDate
-			}
+		if (pubDate == time.Time{}) {
+			fmt.Printf("Cant format date : %s", obj.PubDate)
+		}
 
-			var downloadStatus db.DownloadStatus
-			if setting.AutoDownload {
-				if !newPodcast {
+		var downloadStatus db.DownloadStatus
+		if setting.AutoDownload {
+			if !newPodcast {
+				downloadStatus = db.NotDownloaded
+			} else {
+				if i < limit {
 					downloadStatus = db.NotDownloaded
 				} else {
-					if i < limit {
-						downloadStatus = db.NotDownloaded
-					} else {
-						downloadStatus = db.Deleted
-					}
+					downloadStatus = db.Deleted
 				}
-			} else {
-				downloadStatus = db.Deleted
 			}
+		} else {
+			downloadStatus = db.Deleted
+		}
 
-			if newPodcast && !setting.DownloadOnAdd {
-				downloadStatus = db.Deleted
-			}
+		if newPodcast && !setting.DownloadOnAdd {
+			downloadStatus = db.Deleted
+		}
 
-			if podcast.IsPaused {
-				downloadStatus = db.Deleted
-			}
+		if podcast.IsPaused {
+			downloadStatus = db.Deleted
+		}
 
-			summary := strip.StripTags(obj.Summary)
-			if summary == "" {
-				summary = strip.StripTags(obj.Description)
-			}
+		summary := strip.StripTags(obj.Summary)
+		if summary == "" {
+			summary = strip.StripTags(obj.Description)
+		}
 
+		exists, _ := db.DoesPodcastItemExist(podcast.ID, obj.Guid.Text)
+		if !exists {
+			fmt.Printf("Adding new podcast episode: %s - %s\n", podcast.Title, obj.Title)
 			podcastItem = db.PodcastItem{
 				PodcastID:      podcast.ID,
 				Title:          obj.Title,
@@ -346,19 +328,27 @@ func AddPodcastItems(podcast *db.Podcast, newPodcast bool) error {
 				Image:          obj.Image.Href,
 				DownloadStatus: downloadStatus,
 			}
-			db.CreatePodcastItem(&podcastItem)
-			itemsAdded[podcastItem.ID] = podcastItem.FileURL
+			err = db.CreatePodcastItem(&podcastItem)
+			if err != nil {
+				return err
+			}
 		}
+
+		// Update podcasts latest episode date
+		if latestDate.Before(pubDate) {
+			latestDate = pubDate
+		}
+
 	}
+
 	if (latestDate != time.Time{}) {
 		db.UpdateLastEpisodeDateForPodcast(podcast.ID, latestDate)
 	}
-	//go updateSizeFromUrl(itemsAdded)
+
 	return err
 }
 
 func updateSizeFromUrl(itemUrlMap map[string]string) {
-
 	for id, url := range itemUrlMap {
 		size, err := GetFileSizeFromUrl(url)
 		if err != nil {
@@ -367,7 +357,6 @@ func updateSizeFromUrl(itemUrlMap map[string]string) {
 
 		db.UpdatePodcastItemFileSize(id, size)
 	}
-
 }
 
 func UpdateAllFileSizes() {
