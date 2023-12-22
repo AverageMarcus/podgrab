@@ -594,7 +594,7 @@ func CheckMissingFiles() error {
 	for _, item := range *data {
 		fileExists := FileExists(item.DownloadPath)
 		if !fileExists {
-			fmt.Printf("Missing file: %s\n", item.DownloadPath)
+			fmt.Printf("Missing file: %s - %s\n", item.Title, item.DownloadPath)
 			if setting.DontDownloadDeletedFromDisk {
 				SetPodcastItemAsNotDownloaded(item.ID, db.Deleted)
 			} else {
