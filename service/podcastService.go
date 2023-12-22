@@ -585,16 +585,16 @@ func DownloadMissingEpisodes() error {
 	return nil
 }
 func CheckMissingFiles() error {
-	data, err := db.GetAllPodcastItemsAlreadyDownloaded()
+	fmt.Println("Checking all podcasts for missing files")
 	setting := db.GetOrCreateSetting()
-
-	//fmt.Println("Processing episodes: ", strconv.Itoa(len(*data)))
+	data, err := db.GetAllPodcastItemsAlreadyDownloaded()
 	if err != nil {
 		return err
 	}
 	for _, item := range *data {
 		fileExists := FileExists(item.DownloadPath)
 		if !fileExists {
+			fmt.Printf("Missing file: %s\n", item.DownloadPath)
 			if setting.DontDownloadDeletedFromDisk {
 				SetPodcastItemAsNotDownloaded(item.ID, db.Deleted)
 			} else {

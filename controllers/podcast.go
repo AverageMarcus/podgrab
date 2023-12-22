@@ -205,6 +205,11 @@ func RefreshEpisodes(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
+func CheckMissing(c *gin.Context) {
+	go service.CheckMissingFiles()
+	c.JSON(200, gin.H{})
+}
+
 func RefreshEpisodesByPodcastId(c *gin.Context) {
 	var searchByIdQuery SearchByIdQuery
 
