@@ -72,58 +72,77 @@
 
       <div id="app" v-cloak>
 
-  <button @click="toggleFilters()" class="u-full-width">
-    <span  v-show="!showFilters">Show Filters</span>
-    <span  v-show="showFilters">Hide Filters</span>
-  </button>
-    <form id="filters" @submit.prevent="submitFilters()" v-show="showFilters">
-      <div class="row">
-         <input class="columns five" type="search" @input="searchQueryUpated()" v-model="filter.q" placeholder="Search">
-    <div class="columns three">    <vue-multiselect v-model="selectedSorting" :options="sortOptions" :searchable="false"
-       :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
-       placeholder="Sort By" label="Label" track-by="Value" :preselect-first="true">
-      </vue-multiselect></div>
-    <div class="columns one">      <vue-multiselect :show-pointer="false"  v-model="filter.count" :options="pagingOptions" :searchable="false"  :allow-empty="false" :close-on-select="true" :show-labels="false" placeholder="Pick a value"></vue-multiselect>
-</div>
 
-<div class="columns three">    <vue-multiselect v-model="selectedPlayedStatus" :options="playedStatusOptions" :searchable="false"
-  :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
-  placeholder="Sort By" label="Label" track-by="Value" :preselect-first="true">
- </vue-multiselect></div>
+        <div v-show="singlePodcast">
+          <div class="row">
+            <div class="columns one"><strong>Author:</strong></div>
+            <div class="columns eleven">${podcasts[0].Author}</div>
+          </div>
+          <div class="row">
+            <div class="columns one"><strong>Summary:</strong></div>
+            <div class="columns ten">${podcasts[0].Summary}</div>
+          </div>
+          <div><strong>Original Feed:</strong> <a target="_blank" :href="podcasts[0].URL">Link</a> | <strong>Podgrab Feed:</strong> <a target="_blank" :href="'/podcasts/'+podcasts[0].ID+'/rss'">Link</a></div>
+          <hr>
+        </div>
 
+        <button @click="toggleFilters()" class="u-full-width">
+          <span  v-show="!showFilters">Show Filters</span>
+          <span  v-show="showFilters">Hide Filters</span>
+        </button>
+        <form id="filters" @submit.prevent="submitFilters()" v-show="showFilters">
+          <div class="row">
+            <input class="columns five" type="search" @input="searchQueryUpated()" v-model="filter.q" placeholder="Search">
+            <div class="columns three"> <vue-multiselect v-model="selectedSorting" :options="sortOptions" :searchable="false"
+                :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
+                placeholder="Sort By" label="Label" track-by="Value" :preselect-first="true">
+              </vue-multiselect></div>
+            <div class="columns one"> <vue-multiselect :show-pointer="false" v-model="filter.count" :options="pagingOptions"
+                :searchable="false" :allow-empty="false" :close-on-select="true" :show-labels="false"
+                placeholder="Pick a value"></vue-multiselect>
+            </div>
 
-  </div>
-    <div class="row">
-      <vue-multiselect class="columns three" v-model="selectedPodcasts" :options="podcasts"  :show-labels="false"
-      :multiple="true" :close-on-select="false" :clear-on-select="false"
-      :preserve-search="true" placeholder="Podcasts" label="Title" track-by="ID" :preselect-first="false">
-        <template slot="selection" slot-scope="{ values, search, isOpen }">
-          <span class="multiselect__single" v-if="values.length && !isOpen">${ values.length } options selected</span>
-        </template>
-      </vue-multiselect>
-      <vue-multiselect class="columns three" v-model="selectedTags"  :show-labels="false" :options="tags" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Tags" label="Label" track-by="ID" :preselect-first="false">
-        <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length && !isOpen">${ values.length } options selected</span></template>
-      </vue-multiselect>
-      <div class="columns three">    <vue-multiselect v-model="selectedDownloadStatus" :options="downloadStatusOptions" :searchable="false"
-        :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
-        placeholder="Download Status" label="Label" track-by="Value" :preselect-first="true">
-       </vue-multiselect></div>
-      <div class="columns three">    <vue-multiselect v-model="selectedEpisodeType" :options="episodeTypeOptions" :searchable="false"
-        :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
-        placeholder="Episode Type" label="Label" track-by="Value" :preselect-first="true">
-       </vue-multiselect></div>
-    </div>
-    <div class="row">
-       <div class="columns three">
-        <a title="Play items in this page" v-if="podcastItems.length" class="button" @click="playPage()"><i class="fas fa-play"></i></a>
-        <a title="Enqueue items in this page" v-if="podcastItems.length" class="button  button-enqueue" @click="enqueuePage()"><i class="fas fa-plus"></i></a>
-        <a title="Reset Filters" class="button" @click="resetFilters()"><i class="fas fa-undo"></i></a>
+            <div class="columns three"> <vue-multiselect v-model="selectedPlayedStatus" :options="playedStatusOptions"
+                :searchable="false" :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false"
+                :show-labels="false" placeholder="Sort By" label="Label" track-by="Value" :preselect-first="true">
+              </vue-multiselect></div>
+          </div>
+          <div class="row">
+            <vue-multiselect class="columns three" v-model="selectedPodcasts" :options="podcasts" :show-labels="false"
+              :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Podcasts"
+              label="Title" track-by="ID" :preselect-first="false">
+              <template slot="selection" slot-scope="{ values, search, isOpen }">
+                <span class="multiselect__single" v-if="values.length && !isOpen">${ values.length } options selected</span>
+              </template>
+            </vue-multiselect>
+            <vue-multiselect class="columns three" v-model="selectedTags" :show-labels="false" :options="tags" :multiple="true"
+              :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Tags" label="Label"
+              track-by="ID" :preselect-first="false">
+              <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single"
+                  v-if="values.length && !isOpen">${ values.length } options selected</span></template>
+            </vue-multiselect>
+            <div class="columns three"> <vue-multiselect v-model="selectedDownloadStatus" :options="downloadStatusOptions"
+                :searchable="false" :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false"
+                :show-labels="false" placeholder="Download Status" label="Label" track-by="Value" :preselect-first="true">
+              </vue-multiselect></div>
+            <div class="columns three"> <vue-multiselect v-model="selectedEpisodeType" :options="episodeTypeOptions"
+                :searchable="false" :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false"
+                :show-labels="false" placeholder="Episode Type" label="Label" track-by="Value" :preselect-first="true">
+              </vue-multiselect></div>
+          </div>
+          <div class="row">
+            <div class="columns three">
+              <a title="Play items in this page" v-if="podcastItems.length" class="button" @click="playPage()"><i
+                  class="fas fa-play"></i></a>
+              <a title="Enqueue items in this page" v-if="podcastItems.length" class="button  button-enqueue"
+                @click="enqueuePage()"><i class="fas fa-plus"></i></a>
+              <a title="Reset Filters" class="button" @click="resetFilters()"><i class="fas fa-undo"></i></a>
 
-      </div>
+            </div>
 
-    </div>
-    </form>
- <hr>
+          </div>
+        </form>
+        <hr>
 
 
   <template v-for="item in podcastItems"  >
@@ -386,57 +405,57 @@ var app = new Vue({
             if(localStorage && localStorage.showFilters){
               this.showFilters=JSON.parse(localStorage.showFilters);
             }
-
-            if(this.filter.podcastIds!=null){
-              var selectedPodcasts=[];
-              for(var i=0;i<this.podcasts.length;i++){
-                for(var j=0;j<this.filter.podcastIds.length;j++){
-                  if(this.filter.podcastIds[j]===this.podcasts[i].ID){
-                    selectedPodcasts.push( this.podcasts[i])
-                  }
-                }
-              }
-              this.selectedPodcasts=selectedPodcasts
-            }
-
-            if(this.filter.tagIds!=null){
-              var selectedTags=[];
-              for(var i=0;i<this.tags.length;i++){
-                for(var j=0;j<this.filter.tagIds.length;j++){
-                if(this.filter.tagIds[j]===this.tags[i].ID){
-                  selectedTags.push( this.tags[i])
-                }
-              }
-              }
-              this.selectedTags=selectedTags
-            }
-
-            for(var i=0;i<this.sortOptions.length;i++){
-              if(this.sortOptions[i].Value===this.filter.sorting){
-                this.selectedSorting=this.sortOptions[i]
-              }
-            }
-
-            for(var i=0;i<this.downloadStatusOptions.length;i++){
-              if(this.downloadStatusOptions[i].Value===this.filter.downloadStatus.toString()){
-                this.selectedDownloadStatus=this.downloadStatusOptions[i]
-              }
-            }
-
-            for(var i=0;i<this.episodeTypeOptions.length;i++){
-              if(this.episodeTypeOptions[i].Value===this.filter.episodeType.toString()){
-                this.selectedEpisodeType=this.episodeTypeOptionsOptions[i]
-              }
-            }
-
-            for(var i=0;i<this.playedStatusOptions.length;i++){
-              if(this.playedStatusOptions[i].Value===this.filter.isPlayed.toString()){
-                this.selectedPlayedStatus=this.playedStatusOptions[i]
-              }
-            }
-            this.filter.page=1;
-            this.getData()
           }
+
+          if(this.filter.podcastIds!=null){
+            var selectedPodcasts=[];
+            for(var i=0;i<this.podcasts.length;i++){
+              for(var j=0;j<this.filter.podcastIds.length;j++){
+                if(this.filter.podcastIds[j]===this.podcasts[i].ID){
+                  selectedPodcasts.push( this.podcasts[i])
+                }
+              }
+            }
+            this.selectedPodcasts=selectedPodcasts
+          }
+
+          if(this.filter.tagIds!=null){
+            var selectedTags=[];
+            for(var i=0;i<this.tags.length;i++){
+              for(var j=0;j<this.filter.tagIds.length;j++){
+              if(this.filter.tagIds[j]===this.tags[i].ID){
+                selectedTags.push( this.tags[i])
+              }
+            }
+            }
+            this.selectedTags=selectedTags
+          }
+
+          for(var i=0;i<this.sortOptions.length;i++){
+            if(this.sortOptions[i].Value===this.filter.sorting){
+              this.selectedSorting=this.sortOptions[i]
+            }
+          }
+
+          for(var i=0;i<this.downloadStatusOptions.length;i++){
+            if(this.downloadStatusOptions[i].Value===this.filter.downloadStatus.toString()){
+              this.selectedDownloadStatus=this.downloadStatusOptions[i]
+            }
+          }
+
+          for(var i=0;i<this.episodeTypeOptions.length;i++){
+            if(this.episodeTypeOptions[i].Value===this.filter.episodeType.toString()){
+              this.selectedEpisodeType=this.episodeTypeOptionsOptions[i]
+            }
+          }
+
+          for(var i=0;i<this.playedStatusOptions.length;i++){
+            if(this.playedStatusOptions[i].Value===this.filter.isPlayed.toString()){
+              this.selectedPlayedStatus=this.playedStatusOptions[i]
+            }
+          }
+          this.filter.page=1;
+          this.getData()
         },
         methods:{
           getRelativeDate(dt){
@@ -585,7 +604,9 @@ var app = new Vue({
                 self.filter=response.data.filter;
                 self.saveFilter(self.filter);
                 self.updateUrl();
-                setPageTitle("Episodes ("+self.filter.totalCount+")")
+                if (!self.singlePodcast) {
+                  setPageTitle("Episodes ("+self.filter.totalCount+")")
+                }
               })
               .catch(function (error) {
                 if (error.response && error.response.data && error.response.data.message) {
