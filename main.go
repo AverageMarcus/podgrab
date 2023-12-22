@@ -184,6 +184,7 @@ func main() {
 
 	router.GET("/refreshAll", controllers.RefreshEpisodes)
 	router.GET("/checkMissing", controllers.CheckMissing)
+	router.GET("/updateFileSizes", controllers.UpdateFileSizes)
 	router.GET("/add", controllers.AddPage)
 	router.GET("/search", controllers.Search)
 	router.GET("/", controllers.HomePage)

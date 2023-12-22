@@ -210,6 +210,11 @@ func CheckMissing(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
+func UpdateFileSizes(c *gin.Context) {
+	go service.UpdateAllFileSizes()
+	c.JSON(200, gin.H{})
+}
+
 func RefreshEpisodesByPodcastId(c *gin.Context) {
 	var searchByIdQuery SearchByIdQuery
 

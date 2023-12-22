@@ -53,7 +53,8 @@ function insertText(elemID, text){
 </div>
 <div class="row">
     <button class="button" title="Check missing files" onclick="checkMissing()">Check Missing Files</button>
-    <button class="button" title="Refresh all RSS feeds." onclick="refreshEpisodes()">Refresh All Feeds</button>
+    <button class="button" title="Refresh all RSS feeds" onclick="refreshEpisodes()">Refresh All Feeds</button>
+    <button class="button" title="Update all file sizes" onclick="updateFileSizes()">Update all file sizes</button>
 </div>
 <hr>
 <div class="row" id="app">
@@ -223,6 +224,34 @@ function checkMissing() {
     .then(function (response) {
       Vue.toasted.show(
         "All podcasts are being checked for missing files.",
+        {
+          theme: "bubble",
+          type: "info",
+          position: "top-right",
+          duration: 5000,
+        }
+      );
+    })
+    .catch(function (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        Vue.toasted.show(error.response.data.message, {
+          theme: "bubble",
+          type: "error",
+          position: "top-right",
+          duration: 5000,
+        });
+      }
+    })
+    .then(function () {});
+  return false;
+}
+
+function updateFileSizes() {
+  axios
+    .get("/updateFileSizes")
+    .then(function (response) {
+      Vue.toasted.show(
+        "All file sizes are being recalculated.",
         {
           theme: "bubble",
           type: "info",
