@@ -630,8 +630,6 @@ func DeleteEpisodeFile(podcastItemId string) error {
 func DownloadSingleEpisode(podcastItemId string) error {
 	var podcastItem db.PodcastItem
 	err := db.GetPodcastItemById(podcastItemId, &podcastItem)
-
-	//fmt.Println("Processing episodes: ", strconv.Itoa(len(*data)))
 	if err != nil {
 		return err
 	}
@@ -641,7 +639,6 @@ func DownloadSingleEpisode(podcastItemId string) error {
 
 	podcastFileName := FormatFileName(&podcastItem, setting.FileNameFormat)
 	url, err := Download(podcastItem.FileURL, podcastItem.Title, podcastItem.Podcast.Title, podcastFileName)
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
@@ -657,14 +654,13 @@ func DownloadSingleEpisode(podcastItemId string) error {
 func RefreshEpisodes() error {
 	var data []db.Podcast
 	err := db.GetAllPodcasts(&data, "")
-
 	if err != nil {
 		return err
 	}
+
 	for _, item := range data {
 		RefreshPodcast(&item)
 	}
-	//	setting := db.GetOrCreateSetting()
 
 	go DownloadMissingEpisodes()
 

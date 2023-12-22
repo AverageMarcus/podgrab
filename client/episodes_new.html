@@ -184,81 +184,47 @@
           </div>
           <p class="useMore">${item.Summary }</p>
 
-          <a
-          v-if="item.IsPlayed"
-          class="button button"
-          title="Mark as not listened"
-          @click="changePlayedStatus(item)"
-          ><i class="fas fa-envelope"></i
-        ></a>
+          <!-- Play status -->
+          <a v-if="item.IsPlayed" class="button button" title="Mark as not listened" @click="changePlayedStatus(item)">
+            <i class="fas fa-envelope"></i>
+          </a>
+          <a v-if="!item.IsPlayed" class="button button" title="Mark as listened" @click="changePlayedStatus(item)">
+            <i class="fas fa-envelope-open"></i>
+          </a>
 
-        <a
-         v-if="!item.IsPlayed"
-          class="button button"
-          title="Mark as listened"
-          @click="changePlayedStatus(item)"
-          ><i class="fas fa-envelope-open"></i
-        ></a>
-        <a
-        v-if="!isBookmarked(item)"
-          class="button button"
-          title="Bookmark Episode"
-          @click="changeBookmarkStatus(item)"
-          ><i class="far fa-bookmark"></i
-        ></a>
+          <!-- Bookmarked status -->
+          <a v-if="!isBookmarked(item)" class="button button" title="Bookmark Episode" @click="changeBookmarkStatus(item)">
+            <i class="far fa-bookmark"></i>
+          </a>
+          <a v-if="isBookmarked(item)" class="button button" title="Remove Bookmark" @click="changeBookmarkStatus(item)">
+            <i class="fas fa-bookmark"></i>
+          </a>
 
-        <a
-        v-if="isBookmarked(item)"
-          class="button button"
-          title="Remove Bookmark"
-          @click="changeBookmarkStatus(item)"
-          ><i class="fas fa-bookmark"></i
-        ></a>
+          <!-- Download to device -->
+          <a v-if="item.DownloadPath" class="button" :href="downloadFromServer(item)" download title="Download episode file">
+            <i class="fas fa-download"></i>
+          </a>
 
-        <a
-          v-if="item.DownloadPath"
-          class="button"
-          :href="downloadFromServer(item)"
-          download
-          title="Download episode file"
-          ><i class="fas fa-download"></i
-        ></a>
-        <a
-          v-if="item.DownloadPath"
-          class="button button"
-          @click="deleteFile(item)"
-          title="Delete Podcast Episode File"
-          ><i class="fas fa-trash"></i
-        ></a>
-        <a
-        v-if="settings.AutoDownload && !item.DownloadPath"
-        class="button button"
-        @click="downloadToDisk(item)"
-        title="Download to server"
-        download
-        ><i class="fas fa-cloud-download-alt"></i
-      ></a>
-      <a
-      v-if="!settings.AutoDownload && !item.DownloadPath && item.DownloadStatus===3"
-        class="button button"
-        @click="downloadToDisk(item)"
-        title="Download to server"
-        download
-        ><i class="fas fa-cloud-download-alt"></i
-      ></a>
-      <a
-          class="button button"
-          @click="openPlayer(item)"
-          title="Play Episode"
-          ><i class="fas fa-play"></i
-        ></a>
-        <a
-        class="button button-enqueue"
-        @click="enqueueEpisode(item)"
-        title="Add Episode to existing player playlist"
-        ><i class="fas fa-plus"></i
-      ></a>
-        </div>  <div class="columns one"></div>
+          <!-- Download to server -->
+          <a class="button button" @click="downloadToDisk(item)" title="Download to server" download>
+            <i class="fas fa-cloud-download-alt"></i>
+          </a>
+
+          <!-- Delete from server -->
+          <a v-if="item.DownloadPath" class="button button" @click="deleteFile(item)" title="Delete Podcast Episode File">
+            <i class="fas fa-trash"></i>
+          </a>
+
+          <!-- Playback controls -->
+          <a class="button button" @click="openPlayer(item)" title="Play Episode">
+            <i class="fas fa-play"></i>
+          </a>
+          <a class="button button-enqueue" @click="enqueueEpisode(item)" title="Add Episode to existing player playlist">
+            <i class="fas fa-plus"></i>
+          </a>
+
+        </div>
+        <div class="columns one"></div>
       </div>
      <hr />
     </template>
@@ -681,7 +647,7 @@ var app = new Vue({
             if (callNow) func.apply(context, args);
           };
         };
-              function downloadToDisk(id) {
+      function downloadToDisk(id) {
         axios
           .get("/podcastitems/" + id + "/download")
           .then(function (response) {
