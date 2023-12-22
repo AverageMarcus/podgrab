@@ -14,10 +14,12 @@ type Pagination struct {
 type EpisodeSort string
 
 const (
-	RELEASE_ASC   EpisodeSort = "release_asc"
-	RELEASE_DESC  EpisodeSort = "release_desc"
-	DURATION_ASC  EpisodeSort = "duration_asc"
-	DURATION_DESC EpisodeSort = "duration_desc"
+	RELEASE_ASC    EpisodeSort = "release_asc"
+	RELEASE_DESC   EpisodeSort = "release_desc"
+	DURATION_ASC   EpisodeSort = "duration_asc"
+	DURATION_DESC  EpisodeSort = "duration_desc"
+	FILE_SIZE_ASC  EpisodeSort = "size_asc"
+	FILE_SIZE_DESC EpisodeSort = "size_desc"
 )
 
 type EpisodesFilter struct {

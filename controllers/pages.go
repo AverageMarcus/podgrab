@@ -85,7 +85,10 @@ func PodcastPage(c *gin.Context) {
 				if to > totalCount {
 					to = totalCount
 				}
-				c.HTML(http.StatusOK, "episodes.html", gin.H{
+
+				tags, _ := db.GetAllTags("")
+
+				c.HTML(http.StatusOK, "episodes_new.html", gin.H{
 					"title":          podcast.Title,
 					"podcastItems":   podcast.PodcastItems[from:to],
 					"setting":        setting,
@@ -97,6 +100,15 @@ func PodcastPage(c *gin.Context) {
 					"previousPage":   previousPage,
 					"downloadedOnly": false,
 					"podcastId":      searchByIdQuery.Id,
+					"singlePodcast":  true,
+
+					"filter": model.EpisodesFilter{
+						PodcastIds: []string{podcast.ID},
+						Sorting:    model.RELEASE_DESC,
+					},
+					"podcasts":    []db.Podcast{podcast},
+					"tags":        tags,
+					"sortOptions": getSortOptions(),
 				})
 			} else {
 				c.JSON(http.StatusBadRequest, err)
@@ -248,6 +260,8 @@ func getSortOptions() interface{} {
 		{"Release (desc)", "release_desc"},
 		{"Duration (asc)", "duration_asc"},
 		{"Duration (desc)", "duration_desc"},
+		{"File Size (asc)", "size_asc"},
+		{"File Size (desc)", "size_desc"},
 	}
 }
 func AllEpisodesPage(c *gin.Context) {

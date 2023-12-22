@@ -49,6 +49,10 @@ func getSortOrder(sorting model.EpisodeSort) string {
 		return "duration asc"
 	case model.DURATION_DESC:
 		return "duration desc"
+	case model.FILE_SIZE_ASC:
+		return "file_size asc"
+	case model.FILE_SIZE_DESC:
+		return "file_size desc"
 	default:
 		return "pub_date desc"
 	}

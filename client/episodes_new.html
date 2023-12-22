@@ -12,7 +12,7 @@
         display: none;
       }
 
-      
+
       h2,
       h3,
       h4,
@@ -53,20 +53,23 @@
       }
       body.playerExists .button-enqueue{
         display: inline-block;
-      
-        [v-cloak] {
-        display: none;
-      }
-}
 
+        [v-cloak] {
+          display: none;
+        }
+      }
+
+      .item-metadata {
+        margin-bottom: 8px;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       {{template "navbar" .}}
 
-      <br />{{$setting := .setting}} 
-      
+      <br />{{$setting := .setting}}
+
       <div id="app" v-cloak>
 
   <button @click="toggleFilters()" class="u-full-width">
@@ -82,17 +85,17 @@
       </vue-multiselect></div>
     <div class="columns one">      <vue-multiselect :show-pointer="false"  v-model="filter.count" :options="pagingOptions" :searchable="false"  :allow-empty="false" :close-on-select="true" :show-labels="false" placeholder="Pick a value"></vue-multiselect>
 </div>
-  
+
 <div class="columns three">    <vue-multiselect v-model="selectedPlayedStatus" :options="playedStatusOptions" :searchable="false"
   :multiple="false" :close-on-select="true" :clear-on-select="true" :allow-empty="false" :show-labels="false"
   placeholder="Sort By" label="Label" track-by="Value" :preselect-first="true">
  </vue-multiselect></div>
-      
-   
+
+
   </div>
     <div class="row">
       <vue-multiselect class="columns three" v-model="selectedPodcasts" :options="podcasts"  :show-labels="false"
-      :multiple="true" :close-on-select="false" :clear-on-select="false" 
+      :multiple="true" :close-on-select="false" :clear-on-select="false"
       :preserve-search="true" placeholder="Podcasts" label="Title" track-by="ID" :preselect-first="false">
         <template slot="selection" slot-scope="{ values, search, isOpen }">
           <span class="multiselect__single" v-if="values.length && !isOpen">${ values.length } options selected</span>
@@ -115,9 +118,9 @@
         <a title="Play items in this page" v-if="podcastItems.length" class="button" @click="playPage()"><i class="fas fa-play"></i></a>
         <a title="Enqueue items in this page" v-if="podcastItems.length" class="button  button-enqueue" @click="enqueuePage()"><i class="fas fa-plus"></i></a>
         <a title="Reset Filters" class="button" @click="resetFilters()"><i class="fas fa-undo"></i></a>
-       
+
       </div>
-      
+
     </div>
     </form>
  <hr>
@@ -136,7 +139,7 @@
         </div>
         <div class="columns ten">
           <div class="row">
-            <div class="columns eight">
+            <div class="columns twelve">
               <h4>
                 <i
                    v-if="item.IsPlayed"
@@ -144,7 +147,7 @@
                    style="color: green"
                    class="fas fa-check-circle"
                  ></i>
-                 ${item.Title} <template v-if="item.Podcast && item.Podcast.Title"> // 
+                 ${item.Title} <template v-if="item.Podcast && item.Podcast.Title"> //
                  <a
                    v-if="item.Podcast && item.Podcast.ID"
                    :href="goToShow(item)"
@@ -152,12 +155,12 @@
                    >${item.Podcast.Title}</a></template>
                </h4>
             </div>
-            <div class="columns three">
-              <small :title="item.PubDate">${getRelativeDate(item.PubDate)}</small
-              >
-            </div>
-            <div class="columns one">
-              <small> ${getFormattedDuration(item.Duration)}</small>
+          </div>
+          <div class="row">
+            <div class="columns twelve item-metadata">
+              <span>Published: <small :title="item.PubDate">${getRelativeDate(item.PubDate)}</small></span> |
+              <span>Duration: <small>${getFormattedDuration(item.Duration)}</small></span> |
+              <span>File Size: <small>${getFormattedSize(item.FileSize)}</small></span>
             </div>
           </div>
           <p class="useMore">${item.Summary }</p>
@@ -169,7 +172,7 @@
           @click="changePlayedStatus(item)"
           ><i class="fas fa-envelope"></i
         ></a>
-       
+
         <a
          v-if="!item.IsPlayed"
           class="button button"
@@ -184,7 +187,7 @@
           @click="changeBookmarkStatus(item)"
           ><i class="far fa-bookmark"></i
         ></a>
-      
+
         <a
         v-if="isBookmarked(item)"
           class="button button"
@@ -242,41 +245,41 @@
     </template>
     <p v-if="podcastItems.length===0">Nothing to see here! Maybe try changing the filter criteria.</p>
 
-     
-   
+
+
       <div class="row" v-if="podcastItems.length">
         <div class="columns twelve" style="text-align: center">
-         
+
           <a v-if="filter.previousPage"
            @click=" goToPage(1)"
             class="button"
             >First</a
           >
-          
+
           <a v-if="filter.previousPage"
            @click="goToPreviousPage()"
             class="button"
-            >Previous</a 
+            >Previous</a
           >
-         
-          
+
+
           <select name="page" id="pageDdl" v-model="filter.page" >
               <option :key="index" v-for="index in filter.totalPages" >${index}</option>
           </select>
-          
+
           <select name="count" id="countDdl" v-model="filter.count" >
               <option :key="index" v-for="index in countOptions" >${index}</option>
 
         </select>
-        
+
           <a
           v-if="filter.nextPage"
             class="button"
             @click="goToNextPage()"
             >Next</a
           >
-    
-        
+
+
           <a
           v-if="filter.totalPages>filter.page"
             class="button"
@@ -285,7 +288,7 @@
           >
         </div>
       </div>
-   
+
   </div>
 
     {{template "scripts"}}
@@ -307,7 +310,7 @@ var app = new Vue({
             return this.filter.count;
           }
         },
-      
+
         watch:{
         count(newValue,oldValue){
           if(newValue===oldValue){
@@ -330,16 +333,16 @@ var app = new Vue({
             this.filter.nextPage=newPage+1;
            }
            this.getData()
-           
+
           },
           showFilters(current,old){
-           
+
             if(localStorage){
               localStorage.showFilters=current
             }
 
           },
-          
+
           selectedPodcasts(current,old){
             var arr=[];
             for (let index = 0; index < current.length; index++) {
@@ -376,9 +379,9 @@ var app = new Vue({
           },
         },
         mounted(){
-          if(localStorage && localStorage.episodesFilter){
+          if (!this.singlePodcast) {
+            if(localStorage && localStorage.episodesFilter){
               this.filter=JSON.parse(localStorage.episodesFilter);
-
             }
             if(localStorage && localStorage.showFilters){
               this.showFilters=JSON.parse(localStorage.showFilters);
@@ -388,26 +391,26 @@ var app = new Vue({
               var selectedPodcasts=[];
               for(var i=0;i<this.podcasts.length;i++){
                 for(var j=0;j<this.filter.podcastIds.length;j++){
-                if(this.filter.podcastIds[j]===this.podcasts[i].ID){
-                  selectedPodcasts.push( this.podcasts[i])
+                  if(this.filter.podcastIds[j]===this.podcasts[i].ID){
+                    selectedPodcasts.push( this.podcasts[i])
+                  }
+                }
+              }
+              this.selectedPodcasts=selectedPodcasts
+            }
+
+            if(this.filter.tagIds!=null){
+              var selectedTags=[];
+              for(var i=0;i<this.tags.length;i++){
+                for(var j=0;j<this.filter.tagIds.length;j++){
+                if(this.filter.tagIds[j]===this.tags[i].ID){
+                  selectedTags.push( this.tags[i])
                 }
               }
               }
-              this.selectedPodcasts=selectedPodcasts
-          }
-
-          if(this.filter.tagIds!=null){
-
-            var selectedTags=[];
-            for(var i=0;i<this.tags.length;i++){
-              for(var j=0;j<this.filter.tagIds.length;j++){
-              if(this.filter.tagIds[j]===this.tags[i].ID){
-                selectedTags.push( this.tags[i])
-              }
+              this.selectedTags=selectedTags
             }
-            }
-            this.selectedTags=selectedTags
-          }
+
             for(var i=0;i<this.sortOptions.length;i++){
               if(this.sortOptions[i].Value===this.filter.sorting){
                 this.selectedSorting=this.sortOptions[i]
@@ -432,9 +435,8 @@ var app = new Vue({
               }
             }
             this.filter.page=1;
-          this.getData()
-
-
+            this.getData()
+          }
         },
         methods:{
           getRelativeDate(dt){
@@ -444,10 +446,26 @@ var app = new Vue({
             var obj=luxon.Duration.fromObject({seconds:duration}).shiftTo("hours","minutes","seconds").toObject();
             str="";
             if(obj.hours>0){
-                str+=obj.hours+":"
+                str+=(obj.hours+"").padStart(2, '0')+":"
             }
-            str+=obj.minutes+":"+obj.seconds;
+            str+=(obj.minutes+"").padStart(2, '0')+":"+(obj.seconds+"").padStart(2, '0');
             return str;
+          },
+          getFormattedSize(bytes) {
+            var marker = 1024; // Change to 1000 if required
+            var decimal = 2; // Change as required
+            var kiloBytes = marker; // One Kilobyte is 1024 bytes
+            var megaBytes = marker * marker; // One MB is 1024 KB
+            var gigaBytes = marker * marker * marker; // One GB is 1024 MB
+
+            // return bytes if less than a KB
+            if(bytes < kiloBytes) return bytes + " Bytes";
+            // return KB if less than a MB
+            else if(bytes < megaBytes) return(bytes / kiloBytes).toFixed(decimal) + " KB";
+            // return MB if less than a GB
+            else if(bytes < gigaBytes) return(bytes / megaBytes).toFixed(decimal) + " MB";
+            // return GB if less than a TB
+            else return(bytes / gigaBytes).toFixed(decimal) + " GB";
           },
           getEpisodeImage(item){
             return "/podcastitems/"+item.ID+"/image"
@@ -472,7 +490,7 @@ var app = new Vue({
           },
           changeBookmarkStatus(item){
               isBookmarked= this.isBookmarked(item);
-            
+
               var self=this;
               changeBookmarkStatus(item.ID,!isBookmarked,function(){
                   if(isBookmarked){
@@ -482,7 +500,7 @@ var app = new Vue({
                   }
               })
           },
-          
+
           isBookmarked(item){
             return item.BookmarkDate!==this.nildate
           },
@@ -500,7 +518,7 @@ var app = new Vue({
           },
           searchQueryUpated(){
             var self=this;
-           
+
             clearTimeout(this.debounce)
             this.debounce = setTimeout(() => {
               self.filter.page=1
@@ -515,7 +533,7 @@ var app = new Vue({
           submitFilters(){
             this.filter.page=1;
             this.getData();
-        
+
           },
           toggleFilters(){
             this.showFilters=!this.showFilters
@@ -578,9 +596,8 @@ var app = new Vue({
                     duration: 5000,
                   });
                 }
-              })
-              .then(function () {});
-              }
+              });
+          }
         },
         data: {
           socket:null,
@@ -597,12 +614,13 @@ var app = new Vue({
           selectedPlayedStatus:"",
           countOptions:[10,20,30,40,50,100],
           showFilters:localStorage && localStorage.showFilters && JSON.parse(localStorage.showFilters),
-         
+
             {{ $len := len .podcastItems}}
             podcastItems: {{if gt $len 0}} {{ .podcastItems }} {{else}} [] {{end}},
             settings:{{.setting}},
             filter:{{.filter}},
             podcasts:{{.podcasts}},
+            singlePodcast:{{.singlePodcast}},
             tags:{{.tags}},
             sortOptions:{{.sortOptions}},
             pagingOptions:[10,20,50,100],
@@ -756,7 +774,7 @@ var app = new Vue({
           .then(function () {});
         return false;
       }
-     
+
     </script>
     <script>
 
